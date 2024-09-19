@@ -7,15 +7,15 @@
 #include <utility>
 
 
-Point::Point(std::vector<double> coords) : coordinates(std::move(coords)){}
+Point::Point(const std::vector<double>& coords) : coordinates(coords), cluster(-1), minDist(__DBL_MAX__){}
 
 
 Point::Point(double x, double y) {
     coordinates[0] = x;
     coordinates[1] = y;
+    cluster = -1;
+    minDist = __DBL_MAX__;
 }
-
-
 
 double Point::distance(const Point &other) const {
     double sum = 0.0;
@@ -24,6 +24,14 @@ double Point::distance(const Point &other) const {
     }
     return std::sqrt(sum);
 }
+
+void Point::logPointCoordinates(){
+    for(auto i: coordinates){
+        std::cout << i ;
+    }
+}
+
+
 
 const std::vector<double> &Point::getCoordinates() const {
     return coordinates;
