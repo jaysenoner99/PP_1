@@ -27,7 +27,7 @@ double Point::distance(const Point &other) const {
 
 void Point::logPointCoordinates(){
     for(auto i: coordinates){
-        std::cout << i ;
+        std::cout << i << " ";
     }
 }
 

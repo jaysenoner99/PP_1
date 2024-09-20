@@ -12,10 +12,10 @@
 #define PP_1_DATALOADER_H
 
 
-class DataLoader {
+class Dataset {
     public:
-        explicit DataLoader(std::vector<Point> &data);
-        DataLoader();
+        explicit Dataset(std::vector<Point> &data);
+        Dataset();
         bool loadDataFromCsv(const std::string& path);
         void generateSyntheticDataset(int num_data, int dim_data, double minValue, double maxValue);
         void logDataset();

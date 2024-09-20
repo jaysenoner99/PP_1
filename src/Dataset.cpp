@@ -1,13 +1,13 @@
 //
 // Created by jayse on 05/09/2024.
 //
-#include "../include/DataLoader.h"
+#include "../include/Dataset.h"
 
-DataLoader::DataLoader(std::vector<Point> &data) : dataset(data) {}
+Dataset::Dataset(std::vector<Point> &data) : dataset(data) {}
 
-DataLoader::DataLoader() = default;
+Dataset::Dataset() = default;
 
-bool DataLoader::loadDataFromCsv(const std::string& path) {
+bool Dataset::loadDataFromCsv(const std::string& path) {
 
     std::ifstream file(path);
 
@@ -42,7 +42,7 @@ bool DataLoader::loadDataFromCsv(const std::string& path) {
 
 
 // Function to generate a synthetic dataset
-void DataLoader::generateSyntheticDataset(int numExamples, int dimension, double minValue, double maxValue) {
+void Dataset::generateSyntheticDataset(int numExamples, int dimension, double minValue, double maxValue) {
     // Random number generation setup
     std::random_device rd; // Obtain a random number from hardware
     std::mt19937 gen(rd()); // Seed the generator
@@ -54,6 +54,13 @@ void DataLoader::generateSyntheticDataset(int numExamples, int dimension, double
             coords[j] = dis(gen);
         }
         dataset.emplace_back(coords);
+    }
+}
+
+void Dataset::logDataset() {
+    for(auto row: dataset){
+        row.logPointCoordinates();
+        std::cout << std::endl;
     }
 }
 

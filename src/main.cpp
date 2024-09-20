@@ -1,13 +1,17 @@
 
 #include <iostream>
-#include "../include/DataLoader.h"
+#include "../include/Dataset.h"
 
 int main()
 {
-    DataLoader d;
-    std::string pathname = "data/Iris.csv";
+    Dataset d;
+    /*
+    std::string pathname = "../data/Iris.csv";
     d.loadDataFromCsv(pathname);
-
+    d.logDataset();
+     */
+    d.generateSyntheticDataset(50,2,-10,10);
+    d.logDataset();
 
 
 }
