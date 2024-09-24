@@ -21,7 +21,13 @@ class Point {
         const std::vector<double>& getCoordinates() const;
         void setCoordinates(const std::vector<double>& coords);
         void logPointCoordinates();
-
+        void setCluster(int cluster);
+        int getCluster() const;
+        bool operator==(const Point &rhs) const;
+        bool operator!=(const Point &rhs) const;
+        Point operator+(const Point &rhs) const;
+        Point& operator+=(const Point &rhs);
+        Point operator/(const int div);
 };
 
 

@@ -41,6 +41,54 @@ void Point::setCoordinates(const std::vector<double> &coords) {
     coordinates = coords;
 }
 
+void Point::setCluster(int cluster) {
+    Point::cluster = cluster;
+}
+
+int Point::getCluster() const {
+    return cluster;
+}
+
+bool Point::operator==(const Point &rhs) const {
+    return coordinates == rhs.coordinates;
+}
+
+bool Point::operator!=(const Point &rhs) const {
+    return !(rhs == *this);
+}
+
+Point Point::operator+(const Point &rhs) const {
+    if (coordinates.size() != rhs.coordinates.size()) {
+        throw std::invalid_argument("Points must have the same number of dimensions");
+    }
+
+    std::vector<double> result(coordinates.size());
+    for (std::size_t i = 0; i < coordinates.size(); ++i) {
+        result[i] = coordinates[i] + rhs.coordinates[i];
+    }
+
+    return Point(result);
+}
+
+Point& Point::operator+=(const Point& other) {
+    if (coordinates.size() != other.coordinates.size()) {
+        throw std::invalid_argument("Points must have the same number of dimensions");
+    }
+
+    for (std::size_t i = 0; i < coordinates.size(); ++i) {
+        coordinates[i] += other.coordinates[i];
+    }
+
+    return *this;  // Return the current object (modified)
+}
+
+Point Point::operator/(const int div){
+    std::vector<double> result(coordinates.size());
+    for(std::size_t i = 0; i < coordinates.size(); ++i){
+        result[i] = coordinates[i] / div;
+    }
+    return Point(result);
+}
 
 
 

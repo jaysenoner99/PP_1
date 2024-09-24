@@ -2,18 +2,27 @@
 // Created by jayse on 05/09/2024.
 //
 
-#include <vector>
-#include "Point.h"
+
 #ifndef PP_1_KMEANS_H
 #define PP_1_KMEANS_H
+
+#include <vector>
+#include "Point.h"
+#include "Dataset.h"
+#include <random>
 
 
 class Kmeans {
 
     public:
-        Kmeans();
-        void kMeansClustering(int epochs, int k, std::vector<Point>& dataset);
+        std::vector<Point> centroids;
+        std::vector<Point> data;
+        explicit Kmeans(std::vector<Point>& data);
+        void kMeansClustering(int epochs, int k);
 
+    private:
+        std::vector<Point> random_choice(int k);
+        double compute_min_distance(const Point& p);
 };
 
 
