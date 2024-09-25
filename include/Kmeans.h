@@ -12,6 +12,7 @@
 #include <random>
 
 
+
 class Kmeans {
 
     public:
@@ -22,7 +23,7 @@ class Kmeans {
 
     private:
         std::vector<Point> random_choice(int k);
-        double compute_min_distance(const Point& p);
+        int min_distance_cluster(const Point& p);
 };
 
 

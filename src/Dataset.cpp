@@ -31,11 +31,8 @@ bool Dataset::loadDataFromCsv(const std::string& path) {
                  std::cerr << "Invalid number format: " << value << std::endl;
              }
          }
-
-
          dataset.emplace_back(row);
      }
-
      // Close the file
      file.close();
      return true;
