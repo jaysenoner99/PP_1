@@ -8,10 +8,13 @@
 
 
 
-Kmeans::Kmeans(std::vector<Point>& data) : data(std::move(data)) {};
 
 void Kmeans::kMeansClustering(int max_epochs, int k) {
-    bool object_swapping;
+
+    // TEST: log all point coordinates
+
+
+    bool object_swapping = false;
     int epoch_count = 0;
     while(epoch_count < max_epochs) {
         object_swapping = false;
@@ -19,7 +22,7 @@ void Kmeans::kMeansClustering(int max_epochs, int k) {
         centroids = random_choice(k);
 
         //For each point, assign it to the cluster of its nearest centroid and check if the cluster of that point changed
-        for (auto data_point: data) {
+        for (auto& data_point: data) {
             int new_cluster = min_distance_cluster(data_point);
             if(new_cluster != data_point.getCluster()){
                 object_swapping = true;
@@ -41,8 +44,14 @@ void Kmeans::kMeansClustering(int max_epochs, int k) {
             centroids[i] = centroids[i] / counters[i];
         }
         epoch_count++;
-        //TODO:Check if the centroids have changed enough
+        //TODO:Check if the centroids haven't changed enough
     }
+
+
+    for(auto& point: data){
+        point.log_results();
+    }
+
 
 }
 
@@ -93,26 +102,54 @@ std::vector<Point> Kmeans::random_choice(int k) {
     return selectedPoints;
 }
 
+void Kmeans::plot_clusters2d(int k) {
+    using namespace matplot;
 
-void plotPoints(const std::vector<Point>& points) {
-    std::map<int, std::vector<double>> x_coords;  // Map cluster -> x-coordinates
-    std::map<int, std::vector<double>> y_coords;  // Map cluster -> y-coordinates
+    // Enable holding to plot multiple clusters in one figure
+    hold(true);
 
-    // Populate maps with points based on their clusters
-    for (const auto& point : points) {
-        int cluster = point.getCluster();
-        x_coords[cluster].push_back(point.getCoordinates()[0]);
-        y_coords[cluster].push_back(point.getCoordinates()[1]);
+    // Define a set of distinct colors to use for clusters
+    std::vector<std::string> colors = {"r", "g", "b", "m", "y", "c"};
+
+    // Prepare a vector of x, y coordinates for each cluster
+    for (int cluster_id = 0; cluster_id < k; ++cluster_id) {
+        std::vector<double> x_coords, y_coords;
+
+        // Collect all points for the current cluster
+        for (const auto& point : data) {
+            if (point.getCluster() == cluster_id) {
+                const auto& coordinates = point.getCoordinates();
+                if (coordinates.size() != 2) {
+                    throw std::invalid_argument("All points must have 2 dimensions (x, y).");
+                }
+
+                // Add the (x, y) coordinates to the vectors
+                x_coords.push_back(coordinates[0]);
+                y_coords.push_back(coordinates[1]);
+            }
+        }
+
+        // Plot the points for the current cluster using a unique color
+        scatter(x_coords, y_coords)->marker_size(5).marker_color(colors[cluster_id % colors.size()]);
     }
 
-    // Plot each cluster with a different color
-    for (const auto& entry : x_coords) {
-        int cluster = entry.first;
-        plt::scatter(x_coords[cluster], y_coords[cluster], 10);  // 10 is the marker size
+    // Release the hold so that future plots overwrite this plot
+    hold(false);
+
+    // Show the plot
+    show();
+}
+
+
+Kmeans::Kmeans(const Dataset& d) {
+ data = d.getDataset();
+
+}
+
+void Kmeans::log_results() {
+    for(auto point: data){
+        point.log_results();
+        std::cout << std::endl;
     }
 
-    plt::xlabel("X");
-    plt::ylabel("Y");
-    plt::title("K-Means Clustering Result");
-    plt::show();
 }

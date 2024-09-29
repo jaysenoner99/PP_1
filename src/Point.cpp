@@ -30,7 +30,12 @@ void Point::logPointCoordinates(){
         std::cout << i << " ";
     }
 }
-
+void Point::log_results() {
+    for(auto i: coordinates){
+        std::cout << i << " ";
+    }
+    std::cout << cluster << std::endl;
+}
 
 
 const std::vector<double> &Point::getCoordinates() const {
@@ -42,7 +47,7 @@ void Point::setCoordinates(const std::vector<double> &coords) {
 }
 
 void Point::setCluster(int cluster) {
-    Point::cluster = cluster;
+    this->cluster = cluster;
 }
 
 int Point::getCluster() const {

@@ -5,10 +5,11 @@
 
 int main()
 {
+    int k = 5;
     Dataset d;
-    d.generateSyntheticDataset(50,2,-10,10);
-    std::vector<Point> data_points = d.getDataset();
-
-
+    d.generateSyntheticDataset(50000,2,0,1000);
+    Kmeans kmeans(d);
+    kmeans.kMeansClustering(1000,k);
+    kmeans.plot_clusters2d(k);
 
 }

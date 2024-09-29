@@ -10,16 +10,18 @@
 #include "Point.h"
 #include "Dataset.h"
 #include <random>
-
+#include <matplot/matplot.h>
 
 
 class Kmeans {
 
     public:
+        explicit Kmeans(const Dataset& d);
         std::vector<Point> centroids;
         std::vector<Point> data;
-        explicit Kmeans(std::vector<Point>& data);
         void kMeansClustering(int epochs, int k);
+        void plot_clusters2d(int k);
+        void log_results();
 
     private:
         std::vector<Point> random_choice(int k);

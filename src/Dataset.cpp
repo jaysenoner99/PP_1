@@ -67,7 +67,8 @@ Dataset::Dataset(int num_data, int dim_data, double minValue, double maxValue) {
     generateSyntheticDataset(num_data,dim_data,minValue,maxValue);
 }
 
-std::vector<Point> Dataset::getDataset() const {
+const std::vector<Point> &Dataset::getDataset() const {
     return dataset;
 }
+
 

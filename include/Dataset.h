@@ -8,7 +8,6 @@
 
 #include <vector>
 #include "Point.h"
-#include "Kmeans.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -23,10 +22,9 @@ class Dataset {
         bool loadDataFromCsv(const std::string& path);
         void generateSyntheticDataset(int num_data, int dim_data, double minValue, double maxValue);
         void logDataset();
+        const std::vector<Point> &getDataset() const;
 
-        std::vector<Point> getDataset() const;
-
-private:
+    private:
         std::vector<Point> dataset;
 
 };
