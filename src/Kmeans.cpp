@@ -11,9 +11,6 @@
 
 void Kmeans::kMeansClustering(int max_epochs, int k) {
 
-    // TEST: log all point coordinates
-
-
     bool object_swapping = false;
     int epoch_count = 0;
     while(epoch_count < max_epochs) {
@@ -44,16 +41,11 @@ void Kmeans::kMeansClustering(int max_epochs, int k) {
             centroids[i] = centroids[i] / counters[i];
         }
         epoch_count++;
-        //TODO:Check if the centroids haven't changed enough
     }
-
-
-    for(auto& point: data){
-        point.log_results();
-    }
-
 
 }
+
+
 
 
 int Kmeans::min_distance_cluster(const Point &p){

@@ -1,8 +1,10 @@
-
+#ifdef _OPENMP
+#include <omp.h> // for OpenMP library functions
+#endif
+#include <cstdio>
 #include <iostream>
 #include "../include/Dataset.h"
 #include "../include/Kmeans.h"
-
 int main()
 {
     int k = 5;
@@ -11,5 +13,4 @@ int main()
     Kmeans kmeans(d);
     kmeans.kMeansClustering(1000,k);
     kmeans.plot_clusters2d(k);
-
 }
