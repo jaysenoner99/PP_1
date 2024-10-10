@@ -7,14 +7,13 @@
 #include <utility>
 
 
-Point::Point(const std::vector<double>& coords) : coordinates(coords), cluster(-1), minDist(__DBL_MAX__){}
+Point::Point(const std::vector<double>& coords) : coordinates(coords), cluster(-1){}
 
 
 Point::Point(double x, double y) {
     coordinates[0] = x;
     coordinates[1] = y;
     cluster = -1;
-    minDist = __DBL_MAX__;
 }
 
 double Point::distance(const Point &other) const {

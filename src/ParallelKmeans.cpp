@@ -1,16 +1,13 @@
 //
-// Created by jayse on 05/09/2024.
+// Created by Jay Senoner on 10/10/24.
 //
+#include "../include/ParallelKmeans.h"
 
-#include <utility>
-#include <map>
-#include "../include/Kmeans.h"
+ParallelKmeans::ParallelKmeans(const Dataset &d) {
+    data = d.getDataset();
+}
 
-
-
-
-void Kmeans::kMeansClustering(int max_epochs, int k) {
-
+void ParallelKmeans::parallelkMeansClustering(int max_epochs, int k) {
     bool object_swapping = false;
     int epoch_count = 0;
     //Randomly choose k centroids with uniform probability from the data points
@@ -31,38 +28,22 @@ void Kmeans::kMeansClustering(int max_epochs, int k) {
 
         //Update the centroids
         std::vector<int> counters(k, 0);
+#pragma omp parallel for
         for (const auto &data_point: data) {
             int cluster_id = data_point.getCluster();
             centroids[cluster_id] += data_point;
             counters[cluster_id]++;
         }
+#pragma omp parallel for
         for (int i = 0; i < centroids.size(); ++i) {
             centroids[i] = centroids[i] / counters[i];
         }
         epoch_count++;
         //TODO: Maybe another stopping criterion could be added, like checking if centroids have changed enough after an iteration
     }
-
 }
 
-
-
-
-int Kmeans::min_distance_cluster(const Point &p){
-    std::vector<double> distances;
-    distances.reserve(centroids.size());
-    for(const auto& centroid: centroids){
-        distances.push_back(centroid.distance(p));
-    }
-    auto min = std::min_element(distances.begin(),distances.end());
-    return (int)std::distance(distances.begin(),min);
-}
-
-
-
-
-
-std::vector<Point> Kmeans::random_choice(int k) {
+std::vector<Point> ParallelKmeans::random_choice(int k) {
 
     int totalPoints = (int)data.size();
     if (k > totalPoints) {
@@ -70,31 +51,36 @@ std::vector<Point> Kmeans::random_choice(int k) {
         return {};
     }
 
-    std::random_device rd;   // Obtain a random number from hardware
-    std::mt19937 gen(rd());  // Seed the generator
-    std::uniform_int_distribution<> dist(0, totalPoints - 1); // Range is [0, totalPoints-1]
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dist(0, totalPoints - 1);
     std::vector<Point> selectedPoints;
-
     std::vector<bool> chosen(totalPoints, false);
-
-    // Randomly select k points
+#pragma omp parallel for
     for (int i = 0; i < k; ++i) {
         int randomIndex;
         do {
-            randomIndex = dist(gen); // Generate a random index
-        } while (chosen[randomIndex]); // Ensure it's not a duplicate
+            randomIndex = dist(gen);
+        } while (chosen[randomIndex]);
 
-        // Mark the index as chosen
         chosen[randomIndex] = true;
-
-        // Add the randomly chosen point to the selected points vector
         selectedPoints.push_back(data[randomIndex]);
     }
 
     return selectedPoints;
 }
 
-void Kmeans::plot_clusters2d(int k) {
+int ParallelKmeans::min_distance_cluster(const Point &p) {
+    std::vector<double> distances(centroids.size());
+#pragma omp parallel for // Parallelize this loop
+    for (int i = 0; i < centroids.size(); ++i) {
+        distances[i] = centroids[i].distance(p);
+    }
+    auto min = std::min_element(distances.begin(), distances.end());
+    return (int)std::distance(distances.begin(), min);
+}
+
+void ParallelKmeans::plot_clusters2d(int k) {
     using namespace matplot;
 
     // Enable holding to plot multiple clusters in one figure
@@ -131,18 +117,4 @@ void Kmeans::plot_clusters2d(int k) {
     hold(false);
 
     show();
-}
-
-
-Kmeans::Kmeans(const Dataset& d) {
- data = d.getDataset();
-
-}
-
-void Kmeans::log_results() {
-    for(auto point: data){
-        point.log_results();
-        std::cout << std::endl;
-    }
-
 }
