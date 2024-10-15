@@ -15,7 +15,7 @@ class Point {
 
 public:
         Point(double x, double y);
-        Point();
+        Point(int size);
         explicit Point(const std::vector<double>&  coords);
         double distance(const Point& other) const;
         const std::vector<double>& getCoordinates() const;

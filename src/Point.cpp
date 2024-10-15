@@ -94,14 +94,7 @@ Point Point::operator/(const int div){
     return Point(result);
 }
 
-Point::Point() {
-    cluster = -1;
-    for(auto& coordinate: coordinates)
-    {
-        coordinate = 0;
-    }
-
-}
+Point::Point(int size) : coordinates(size,0) {}
 
 
 

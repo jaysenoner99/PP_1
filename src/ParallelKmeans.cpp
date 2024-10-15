@@ -14,17 +14,18 @@ void ParallelKmeans::parallelkMeansClustering(int max_epochs, int k) {
     //Random initialization of k centroids
 
     centroids = random_choice(k);
-    std::vector<Point> updated_centroids(k,Point());
+    int point_size = centroids[0].getCoordinates().size();
+    std::vector<Point> updated_centroids(k,Point(point_size));
     std::vector<int> cluster_counters(k,0);
 
     for(int i = 0; i < max_epochs; ++i){
-        updated_centroids = std::vector<Point>(k,Point());
+        updated_centroids = std::vector<Point>(k,Point(point_size));
         cluster_counters = std::vector<int>(k,0);
 
-    #pragma omp parallel  default(none) shared(chunk,k,updated_centroids,cluster_counters)
+    #pragma omp parallel num_threads(max_threads)  default(none) shared(chunk,k,updated_centroids,cluster_counters,point_size)
         {
             std::vector<int> private_counts(k, 0);
-            std::vector<Point> private_centroids(k, Point());
+            std::vector<Point> private_centroids(k, Point(point_size));
 #pragma omp for nowait schedule(static, chunk)
             for (auto& point: data) {
                 int new_cluster = min_distance_cluster(point);
