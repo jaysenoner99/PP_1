@@ -8,40 +8,50 @@ ParallelKmeans::ParallelKmeans(const Dataset &d) {
 }
 
 void ParallelKmeans::parallelkMeansClustering(int max_epochs, int k) {
-    bool object_swapping = false;
-    int epoch_count = 0;
-    //Randomly choose k centroids with uniform probability from the data points
-    centroids = random_choice(k);
-    while(epoch_count < max_epochs) {
-        object_swapping = false;
-        //For each point, assign it to the cluster of its nearest centroid and check if the cluster of that point changed
-        for (auto& data_point: data) {
-            int new_cluster = min_distance_cluster(data_point);
-            if(new_cluster != data_point.getCluster()){
-                object_swapping = true;
-            }
-            data_point.setCluster(new_cluster);
-        }
-        //Before updating the centorids, check if at least one object has changed cluster.
-        // If no object has changed its cluster, terminate the execution of the algorithm.
-        if(!object_swapping) break;
+    int max_threads = omp_get_max_threads();
+    int chunk = ceil(data.size()/max_threads);
 
-        //Update the centroids
-        std::vector<int> counters(k, 0);
-#pragma omp parallel for
-        for (const auto &data_point: data) {
-            int cluster_id = data_point.getCluster();
-            centroids[cluster_id] += data_point;
-            counters[cluster_id]++;
+    //Random initialization of k centroids
+
+    centroids = random_choice(k);
+    std::vector<Point> updated_centroids(k,Point());
+    std::vector<int> cluster_counters(k,0);
+
+    for(int i = 0; i < max_epochs; ++i){
+        updated_centroids = std::vector<Point>(k,Point());
+        cluster_counters = std::vector<int>(k,0);
+
+    #pragma omp parallel  default(none) shared(chunk,k,updated_centroids,cluster_counters)
+        {
+            std::vector<int> private_counts(k, 0);
+            std::vector<Point> private_centroids(k, Point());
+#pragma omp for nowait schedule(static, chunk)
+            for (auto& point: data) {
+                int new_cluster = min_distance_cluster(point);
+                point.setCluster(new_cluster);
+                private_centroids[new_cluster] += point;
+                private_counts[new_cluster]++;
+            }
+#pragma omp critical
+            {
+                for (int i = 0; i < k; ++i) {
+                    updated_centroids[i] += private_centroids[i];
+                    cluster_counters[i] += private_counts[i];
+                }
+            }
         }
-#pragma omp parallel for
-        for (int i = 0; i < centroids.size(); ++i) {
-            centroids[i] = centroids[i] / counters[i];
-        }
-        epoch_count++;
-        //TODO: Maybe another stopping criterion could be added, like checking if centroids have changed enough after an iteration
+        for(int j = 0 ; j < k; ++j)
+            updated_centroids[j] = updated_centroids[j]/ cluster_counters[j];
+
+        if(centroids == updated_centroids)
+            return;
+        centroids = updated_centroids;
+
+
     }
+
 }
+
 
 std::vector<Point> ParallelKmeans::random_choice(int k) {
 
@@ -56,7 +66,6 @@ std::vector<Point> ParallelKmeans::random_choice(int k) {
     std::uniform_int_distribution<> dist(0, totalPoints - 1);
     std::vector<Point> selectedPoints;
     std::vector<bool> chosen(totalPoints, false);
-#pragma omp parallel for
     for (int i = 0; i < k; ++i) {
         int randomIndex;
         do {

@@ -11,10 +11,11 @@ class Point {
 
     private:
         std::vector<double> coordinates;
-        int cluster;
+        int cluster{};
 
 public:
         Point(double x, double y);
+        Point();
         explicit Point(const std::vector<double>&  coords);
         double distance(const Point& other) const;
         const std::vector<double>& getCoordinates() const;

@@ -1,14 +1,14 @@
 
 #include <cstdio>
 #include <iostream>
-#include<chrono>
+#include <chrono>
 #include "../include/Dataset.h"
 #include "../include/Kmeans.h"
 int main()
 {
-    int k = 7;
+    int k = 5;
     Dataset d;
-    d.generateSyntheticDataset(5000000,2,0,1000);
+    d.generateSyntheticDataset(500000,2,0,1000);
     Kmeans kmeans(d);
     auto start = std::chrono::high_resolution_clock::now();
     kmeans.kMeansClustering(1000,k);

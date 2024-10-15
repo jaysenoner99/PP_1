@@ -15,7 +15,7 @@ int main(){
     std::cout << "running parallel k means" << std::endl;
     int k = 7;
     Dataset d;
-    d.generateSyntheticDataset(5000000,2,0,1000);
+    d.generateSyntheticDataset(50000,2,0,1000);
     ParallelKmeans kmeans(d);
     auto start = std::chrono::high_resolution_clock::now();
     kmeans.parallelkMeansClustering(1000,k);
