@@ -26,6 +26,7 @@ class Kmeans {
     private:
         std::vector<Point> random_choice(int k);
         int min_distance_cluster(const Point& p);
+        bool not_changed(std::vector<Point>& old_centroids, double tol=1e-5);
 };
 
 

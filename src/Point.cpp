@@ -96,6 +96,23 @@ Point Point::operator/(const int div){
 
 Point::Point(int size) : coordinates(size,0) {}
 
+Point Point::operator-(const Point &rhs) const {
+    std::vector<double> result(coordinates.size());
+    for(std::size_t i = 0; i < coordinates.size(); ++i){
+        result[i] = coordinates[i] - rhs.coordinates[i];
+    }
+    return Point(result);
+}
+
+double Point::l2normdiff(const Point &other) const {
+    double sum= 0.0;
+    for(std::size_t i=0; i < coordinates.size(); ++i ){
+        double diff = coordinates[i] - other.coordinates[i];
+        sum += diff * diff;
+    }
+    return std::sqrt(sum);
+}
+
 
 
 

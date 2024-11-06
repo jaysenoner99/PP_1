@@ -11,23 +11,15 @@
 
 void Kmeans::kMeansClustering(int max_epochs, int k) {
 
-    bool object_swapping = false;
     int epoch_count = 0;
     //Randomly choose k centroids with uniform probability from the data points
     centroids = random_choice(k);
     while(epoch_count < max_epochs) {
-        object_swapping = false;
-        //For each point, assign it to the cluster of its nearest centroid and check if the cluster of that point changed
+        std::vector<Point> old_centroids = centroids;
         for (auto& data_point: data) {
             int new_cluster = min_distance_cluster(data_point);
-            if(new_cluster != data_point.getCluster()){
-                object_swapping = true;
-            }
             data_point.setCluster(new_cluster);
         }
-        //Before updating the centorids, check if at least one object has changed cluster.
-        // If no object has changed its cluster, terminate the execution of the algorithm.
-        if(!object_swapping) break;
 
         //Update the centroids
         std::vector<int> counters(k, 0);
@@ -39,8 +31,10 @@ void Kmeans::kMeansClustering(int max_epochs, int k) {
         for (int i = 0; i < centroids.size(); ++i) {
             centroids[i] = centroids[i] / counters[i];
         }
+
+        if(not_changed(old_centroids)) return;
         epoch_count++;
-        //TODO: Maybe another stopping criterion could be added, like checking if centroids have changed enough after an iteration
+
     }
 
 }
@@ -145,4 +139,12 @@ void Kmeans::log_results() {
         std::cout << std::endl;
     }
 
+}
+
+bool Kmeans::not_changed(std::vector<Point>& old_centroids, double tol) {
+    for(size_t i = 0; i < centroids.size(); ++i){
+        if(centroids[i].l2normdiff(old_centroids[i]) >= tol)
+            return false;
+    }
+    return true;
 }

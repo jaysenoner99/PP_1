@@ -7,14 +7,11 @@ ParallelKmeans::ParallelKmeans(const Dataset &d) {
     data = d.getDataset();
 }
 
-void ParallelKmeans::parallelkMeansClustering(int max_epochs, int k) {
-    int max_threads = omp_get_max_threads();
-    int chunk = ceil(data.size()/max_threads);
-
-    //Random initialization of k centroids
-
+void ParallelKmeans::parallelkMeansClustering(int max_epochs, int k, int threads) {
+    //int max_threads = omp_get_max_threads();
+    int chunk = ceil(static_cast<double>(data.size()) / threads);
     centroids = random_choice(k);
-    int point_size = centroids[0].getCoordinates().size();
+    int point_size = static_cast<int>(centroids[0].getCoordinates().size());
     std::vector<Point> updated_centroids(k,Point(point_size));
     std::vector<int> cluster_counters(k,0);
 
@@ -22,7 +19,7 @@ void ParallelKmeans::parallelkMeansClustering(int max_epochs, int k) {
         updated_centroids = std::vector<Point>(k,Point(point_size));
         cluster_counters = std::vector<int>(k,0);
 
-    #pragma omp parallel num_threads(max_threads)  default(none) shared(chunk,k,updated_centroids,cluster_counters,point_size)
+#pragma omp parallel num_threads(threads)  default(none) shared(chunk,k,updated_centroids,cluster_counters,point_size)
         {
             std::vector<int> private_counts(k, 0);
             std::vector<Point> private_centroids(k, Point(point_size));
@@ -35,17 +32,19 @@ void ParallelKmeans::parallelkMeansClustering(int max_epochs, int k) {
             }
 #pragma omp critical
             {
-                for (int i = 0; i < k; ++i) {
-                    updated_centroids[i] += private_centroids[i];
-                    cluster_counters[i] += private_counts[i];
+                for (int p = 0; p < k; ++p) {
+                    updated_centroids[p] += private_centroids[p];
+                    cluster_counters[p] += private_counts[p];
                 }
             }
         }
         for(int j = 0 ; j < k; ++j)
-            updated_centroids[j] = updated_centroids[j]/ cluster_counters[j];
+        {
+            if(cluster_counters[j] > 0)
+                updated_centroids[j] = updated_centroids[j]/ cluster_counters[j];
+        }
 
-        if(centroids == updated_centroids)
-            return;
+        if(not_changed(updated_centroids)) return;
         centroids = updated_centroids;
 
 
@@ -82,7 +81,6 @@ std::vector<Point> ParallelKmeans::random_choice(int k) {
 
 int ParallelKmeans::min_distance_cluster(const Point &p) {
     std::vector<double> distances(centroids.size());
-#pragma omp parallel for // Parallelize this loop
     for (int i = 0; i < centroids.size(); ++i) {
         distances[i] = centroids[i].distance(p);
     }
@@ -92,7 +90,6 @@ int ParallelKmeans::min_distance_cluster(const Point &p) {
 
 void ParallelKmeans::plot_clusters2d(int k) {
     using namespace matplot;
-
     // Enable holding to plot multiple clusters in one figure
     hold(true);
 
@@ -127,4 +124,16 @@ void ParallelKmeans::plot_clusters2d(int k) {
     hold(false);
 
     show();
+}
+
+bool ParallelKmeans::not_changed(std::vector<Point>& old_centroids, double tol) {
+    for(size_t i = 0; i < centroids.size(); ++i){
+        if(centroids[i].distance(old_centroids[i]) >= tol)
+            return false;
+    }
+    return true;
+}
+
+ParallelKmeans::ParallelKmeans(std::vector<Point>& data) {
+    this->data = data;
 }
