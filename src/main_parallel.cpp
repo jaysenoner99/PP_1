@@ -11,9 +11,10 @@
 #include "../include/ParallelKmeans.h"
 #include "../include/Kmeans.h"
 #include <set>
+#include <string>
 //Speedup = t_s / t_p
 
-std::vector<double> run_test(int n, int k, int max_epochs){
+std::vector<double> run_test(int n, int k, int max_epochs, int repetitions=20){
     Dataset data(n,2,0,1000);
     Kmeans sequential(data);
     ParallelKmeans parallel(data);
@@ -21,16 +22,22 @@ std::vector<double> run_test(int n, int k, int max_epochs){
     double sequential_time = 0;
     double parallel_time = 0;
     std::vector<double> times(omp_get_max_threads(),0);
-    current_time = omp_get_wtime();
-    sequential.kMeansClustering(max_epochs,k);
-    sequential_time = omp_get_wtime() - current_time;
-
-    for(int threads = 1; threads < omp_get_max_threads();++threads){
+    for(int i=0; i < repetitions;++i){
         current_time = omp_get_wtime();
-        parallel.parallelkMeansClustering(max_epochs,k, threads);
-        parallel_time = omp_get_wtime() - current_time;
-        //Compute speed up for each execution with different thread numbers
-        times[threads] = sequential_time /parallel_time;
+        sequential.kMeansClustering(max_epochs,k);
+        sequential_time = sequential_time + omp_get_wtime() - current_time;
+    }
+    sequential_time = sequential_time / repetitions;
+
+    for (int threads = 1; threads < omp_get_max_threads(); ++threads) {
+        for(int i=0; i < repetitions;++i) {
+            current_time = omp_get_wtime();
+            parallel.parallelkMeansClustering(max_epochs, k, threads);
+            parallel_time = parallel_time + omp_get_wtime() - current_time;
+            //Compute speed up for each execution with different thread numbers
+        }
+        parallel_time = parallel_time / repetitions;
+        times[threads] = sequential_time / parallel_time;
     }
     return times;
 }
@@ -44,11 +51,26 @@ std::set<std::vector<double>> run_multiple_tests(int max_n,int k, int max_epochs
        std::cout << "Testing for " + std::to_string(n) + "elements" << std::endl;
     }
     using namespace matplot;
-    for(const auto& lines: speedups){
-        auto plt = plot(lines);
-        plt-> line_width(3.0);
+    //Ensures that the plots directory exists inside the project directory
+    std::filesystem::create_directory("plots");
+    auto plt = plot(speedups);
+    for(const auto& line: plt){
+       line -> line_width(3.0);
     }
+    std::vector<std::string> labels;
+    for(int n=100; n < max_n; n = n + 9*n){
+        labels.push_back("n=" + std::to_string(n));
+    }
+    // Set labels for each line
+    matplot::legend(labels);
 
+    // Set x and y axis labels
+    xlabel("P");
+    ylabel("Speedup(t_s/t_P)");
+
+    // Set plot title
+    title("Speedup, k=" + std::to_string(k));
+    matplot::save("../plots/speedupk" + std::to_string(k) + ".png");
     show();
 }
 int main(){
@@ -66,6 +88,6 @@ int main(){
     std::cout << "Duration:" << duration.count() << "seconds" << std::endl;
     kmeans.plot_clusters2d(k);
 */
-    std::cout <<"Maximum number of threads in this system:" + std::to_string(omp_get_max_threads()) << std::endl;
+    std::cout <<"Maximum number of threads for this machine:" + std::to_string(omp_get_max_threads()) << std::endl;
     std::set<std::vector<double>> speedups = run_multiple_tests(100000,5,10000);
 }
