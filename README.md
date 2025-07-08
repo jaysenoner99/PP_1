@@ -107,4 +107,6 @@ The implementation was tested on an **Intel Core i7-10700K CPU** (8 Cores, 16 Th
 
 The efficiency was shown to increase with larger problem sizes (`n`) and higher cluster counts (`k`), confirming the effectiveness of the parallel design for large-scale problems.
 
+A full technical report written in the English language is available at the root directory of the project under the name `report.pdf`. Below follows the abstract of such report:
 
+*This report presents a comparative study between sequential and OpenMP-parallelized implementations of the k-means clustering algorithm. The aim is to assess the impact of parallelization on performance, particularly in terms of execution time and scalability, while preserving clustering accuracy. The parallel version employs OpenMP to accelerate the most computationally intensive phases of the algorithm: the assignment of data points to clusters and the update of cluster centroids. Results show that the OpenMP-parallel implementation achieves significant performance improvements over the sequential version on multi-core systems, especially for larger datasets, without compromising clustering quality. The findings underline the practical benefits and limitations of using shared-memory parallelism in iterative machine learning algorithms.*
