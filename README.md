@@ -14,24 +14,26 @@ The focus of this work is not just on parallelization, but on a holistic optimiz
 - **CMake Build System:** Provides a clean, cross-platform build process using CMake.
 
 ## Project Structure
-/
-├── CMakeLists.txt
-├── README.md
-├── include/
-│ ├── Kmeans.h
-│ ├── ParallelKmeans.h
-│ ├── Point.h
-│ └── Dataset.h
-├── src/
-│ ├── Kmeans.cpp
-│ ├── ParallelKmeans.cpp
-│ ├── main.cpp
-│ ├── Dataset.cpp
-| ├── Point.cpp
-| ├── main_parallel.cpp
-└── plots/
-└── (Generated plots and CSVs will appear here)
 
+```
+/
+├── CMakeLists.txt  
+├── README.md  
+├── include/  
+│   ├── Kmeans.h  
+│   ├── ParallelKmeans.h  
+│   ├── Point.h  
+│   └── Dataset.h  
+├── src/  
+│   ├── Kmeans.cpp  
+│   ├── ParallelKmeans.cpp  
+│   ├── main.cpp  
+│   ├── Dataset.cpp  
+│   ├── Point.cpp  
+│   └── main_parallel.cpp  
+└── plots/  
+    └── (Generated plots and CSVs will appear here)
+```
 
 ## Getting Started
 
@@ -105,5 +107,4 @@ The implementation was tested on an **Intel Core i7-10700K CPU** (8 Cores, 16 Th
 
 The efficiency was shown to increase with larger problem sizes (`n`) and higher cluster counts (`k`), confirming the effectiveness of the parallel design for large-scale problems.
 
-![Speedup for k=100](plots/speedup_plot_k=100.pdf)
 
