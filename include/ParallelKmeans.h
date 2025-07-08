@@ -5,29 +5,29 @@
 #ifndef PP_1_PARALLELKMEANS_H
 #define PP_1_PARALLELKMEANS_H
 
-
-
-#include <vector>
-#include "Point.h"
 #include "Dataset.h"
-#include <random>
+#include "Point.h"
 #include <matplot/matplot.h>
 #include <omp.h>
-
+#include <random>
+#include <vector>
 class ParallelKmeans {
 
 public:
-    explicit ParallelKmeans(const Dataset& d);
-    explicit ParallelKmeans(std::vector<Point>& data);
-    std::vector<Point> centroids;
-    std::vector<Point> data;
-    void parallelkMeansClustering(int epochs, int k, int threads);
-    void plot_clusters2d(int k);
+  explicit ParallelKmeans(const Dataset &d);
+  explicit ParallelKmeans(std::vector<Point> &data);
+  std::vector<Point> centroids;
+  std::vector<Point> data;
+  void parallelkMeansClustering(int epochs, int k, int threads);
+  void plot_clusters2d(int k, std::string filename);
+
+  const std::vector<Point> &getClusteredData() const { return this->data; }
 
 private:
-    std::vector<Point> random_choice(int k);
-    int min_distance_cluster(const Point& p);
-    bool not_changed(std::vector<Point>& old_centroids, double tol=1e-5);
+  std::vector<Point> random_choice(int k);
+  bool not_changed(std::vector<Point> &old_centroids, double tol = 1e-5);
 
+  int min_distance_cluster(const Point &p,
+                           const std::vector<Point> &current_centroids);
 };
-#endif //PP_1_PARALLELKMEANS_H
+#endif // PP_1_PARALLELKMEANS_H
